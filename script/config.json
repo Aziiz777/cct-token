@@ -1,0 +1,18 @@
+{
+    "phoneToken": {
+        "name": "phone",
+        "symbol": "ph",
+        "decimals": 18,
+        "maxSupply": 0,
+        "withGetCCIPAdmin": true,
+        "ccipAdminAddress": "0xAE1710C414E95B83c247E01E8F30eE117771599B"
+    },
+    "tokenAmountToMint": 1000000000000000000000,
+    "tokenAmountToTransfer": 10000,
+    "feeType": "native",
+    "remoteChains": {
+        "421614": 97,
+        // "11155111": 421614,
+        // "421614": 11155111
+    }
+}
