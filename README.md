@@ -20,7 +20,6 @@ To run this project, you'll need the following tools installed:
 
 - **Foundry**: A fast Ethereum development toolkit.
 - **Git**: For cloning the repository.
-- **Node.js**: Optional, for additional package management if needed.
 - **An Ethereum-compatible wallet**: With testnet funds (e.g., Sepolia ETH, Arbitrum Sepolia ETH, BSC Testnet BNB).
 - **RPC Endpoints**: Access to testnet RPCs for supported chains (Ethereum Sepolia, Arbitrum Sepolia, BSC Testnet).
 
@@ -122,7 +121,7 @@ forge script script/configure.s.sol:Configure --rpc-url https://data-seed-prebsc
 
 Configuration logs show remote chains added successfully.
 
-## . Interact with Contracts Using `cast`
+##  Interact with Contracts Using `cast`
 
 ```bash
 cast call <token-address> "totalSupply()" --rpc-url https://sepolia.infura.io/v3/<your-infura-key>
@@ -193,11 +192,5 @@ cast call <pool-address> "getSupportedChains()" --rpc-url https://rpc.unichain-s
 - **Configuration Fails:** Verify chain selectors, pool addresses, and router compatibility in logs.
 - **Keystore Issues:** Ensure the correct password and account alias are used.
 - **Logs:** Use `console.log` outputs in scripts to debug.
-
----
-
-## License
-
-This project is licensed under the MIT License - see the SPDX-License-Identifier: MIT in the source files.
 
 ---
