@@ -6,7 +6,7 @@ import "forge-std/console.sol";
 
 contract Deploy is BaseScript {
     function run() external {
-        address deployer = address(0xAE1710C414E95B83c247E01E8F30eE117771599B);
+        address deployer = address(0xbf50Be5CE4d697AC06DE50eFb7D545E892575635);
 
         uint256 currentChainId = block.chainid;
         console.log("Deploying on Chain ID:", currentChainId);

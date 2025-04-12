@@ -5,7 +5,7 @@ import "forge-std/Script.sol";
 import "forge-std/console.sol";
 import { IBurnMintERC20 } from "@chainlink-ccip/contracts-ccip/src/v0.8/shared/token/ERC20/IBurnMintERC20.sol";
 import {HelperConfig} from "./HelperConfig.s.sol";
-import {phoneToken} from "../src/phone.sol";
+import {MiddleEastECommerce} from "../src/MiddleEastE-commerce.sol";
 import {BurnMintTokenPool} from "@chainlink-ccip/contracts-ccip/src/v0.8/ccip/pools/BurnMintTokenPool.sol";
 import {TokenPool} from "@chainlink-ccip/contracts-ccip/src/v0.8/ccip/pools/TokenPool.sol";
 import {IRouter} from "@chainlink-ccip/contracts-ccip/src/v0.8/ccip/interfaces/IRouter.sol";
@@ -14,7 +14,7 @@ import {RegistryModuleOwnerCustom} from "@chainlink-ccip/contracts-ccip/src/v0.8
 import {RateLimiter} from "@chainlink-ccip/contracts-ccip/src/v0.8/ccip/libraries/RateLimiter.sol";
 
 contract BaseScript is Script {
-    address owner = address(0xAE1710C414E95B83c247E01E8F30eE117771599B);
+    address owner = address(0xbf50Be5CE4d697AC06DE50eFb7D545E892575635);
     struct NetworkDetails {
         string name;
         uint256 chainId;
@@ -34,43 +34,190 @@ contract BaseScript is Script {
     function setUp() public virtual {
         helperConfig = new HelperConfig();
         
+        Mainnet Configurations
         networks.push(NetworkDetails({
-            name: "EthereumSepolia",
-            chainId: 11155111,
-            chainSelector: helperConfig.getEthereumSepoliaConfig().chainSelector,
-            routerAddress: helperConfig.getEthereumSepoliaConfig().router,
-            linkAddress: helperConfig.getEthereumSepoliaConfig().link,
-            rmnProxyAddress: helperConfig.getEthereumSepoliaConfig().rmnProxy,
-            tokenAdminRegistryAddress: helperConfig.getEthereumSepoliaConfig().tokenAdminRegistry,
-            registryModuleOwnerCustomAddress: helperConfig.getEthereumSepoliaConfig().registryModuleOwnerCustom,
-            token: 0xb8A39E17c49777407AB9dB7e663BB02324e5C642,
-            pool: 0x7F82767cb665661c3040Ec19CC0A963482D969F6
+            name: "EthereumMainnet",
+            chainId: 1,
+            chainSelector: helperConfig.getEthereumMainnetConfig().chainSelector,
+            routerAddress: helperConfig.getEthereumMainnetConfig().router,
+            linkAddress: helperConfig.getEthereumMainnetConfig().link,
+            rmnProxyAddress: helperConfig.getEthereumMainnetConfig().rmnProxy,
+            tokenAdminRegistryAddress: helperConfig.getEthereumMainnetConfig().tokenAdminRegistry,
+            registryModuleOwnerCustomAddress: helperConfig.getEthereumMainnetConfig().registryModuleOwnerCustom,
+            token: 0x0000000000000000000000000000000000000000,
+            pool: 0x0000000000000000000000000000000000000000
         }));
 
         networks.push(NetworkDetails({
-            name: "ArbitrumSepolia",
-            chainId: 421614,
-            chainSelector: helperConfig.getArbitrumSepolia().chainSelector,
-            routerAddress: helperConfig.getArbitrumSepolia().router,
-            linkAddress: helperConfig.getArbitrumSepolia().link,
-            rmnProxyAddress: helperConfig.getArbitrumSepolia().rmnProxy,
-            tokenAdminRegistryAddress: helperConfig.getArbitrumSepolia().tokenAdminRegistry,
-            registryModuleOwnerCustomAddress: helperConfig.getArbitrumSepolia().registryModuleOwnerCustom,
-            token: 0x27284f231245df71D174Eb143c89dCD79B98a920,
-            pool: 0xd14e942eD5Faa4a760f70D1AB43eCb836c827012
+            name: "ArbitrumOne",
+            chainId: 42161,
+            chainSelector: helperConfig.getArbitrumOneConfig().chainSelector,
+            routerAddress: helperConfig.getArbitrumOneConfig().router,
+            linkAddress: helperConfig.getArbitrumOneConfig().link,
+            rmnProxyAddress: helperConfig.getArbitrumOneConfig().rmnProxy,
+            tokenAdminRegistryAddress: helperConfig.getArbitrumOneConfig().tokenAdminRegistry,
+            registryModuleOwnerCustomAddress: helperConfig.getArbitrumOneConfig().registryModuleOwnerCustom,
+            token: 0x0000000000000000000000000000000000000000,
+            pool: 0x0000000000000000000000000000000000000000
         }));
+
         networks.push(NetworkDetails({
-            name: "BSCTestnet",
-            chainId: 97,
-            chainSelector: helperConfig.getBSCTestnetConfig().chainSelector,
-            routerAddress: helperConfig.getBSCTestnetConfig().router,
-            linkAddress: helperConfig.getBSCTestnetConfig().link,
-            rmnProxyAddress: helperConfig.getBSCTestnetConfig().rmnProxy,
-            tokenAdminRegistryAddress: helperConfig.getBSCTestnetConfig().tokenAdminRegistry,
-            registryModuleOwnerCustomAddress: helperConfig.getBSCTestnetConfig().registryModuleOwnerCustom,
-            token: 0x2a16a94262Cb2243266A13Af07C4f69bf5087786,
-            pool:  0xF628798084146cA57D9cE0F298d1B73Cb2334744
+            name: "AvalancheCChain",
+            chainId: 43114,
+            chainSelector: helperConfig.getAvalancheCChainConfig().chainSelector,
+            routerAddress: helperConfig.getAvalancheCChainConfig().router,
+            linkAddress: helperConfig.getAvalancheCChainConfig().link,
+            rmnProxyAddress: helperConfig.getAvalancheCChainConfig().rmnProxy,
+            tokenAdminRegistryAddress: helperConfig.getAvalancheCChainConfig().tokenAdminRegistry,
+            registryModuleOwnerCustomAddress: helperConfig.getAvalancheCChainConfig().registryModuleOwnerCustom,
+            token: 0x0000000000000000000000000000000000000000,
+            pool: 0x0000000000000000000000000000000000000000
         }));
+
+        networks.push(NetworkDetails({
+            name: "BaseMainnet",
+            chainId: 8453,
+            chainSelector: helperConfig.getBaseMainnetConfig().chainSelector,
+            routerAddress: helperConfig.getBaseMainnetConfig().router,
+            linkAddress: helperConfig.getBaseMainnetConfig().link,
+            rmnProxyAddress: helperConfig.getBaseMainnetConfig().rmnProxy,
+            tokenAdminRegistryAddress: helperConfig.getBaseMainnetConfig().tokenAdminRegistry,
+            registryModuleOwnerCustomAddress: helperConfig.getBaseMainnetConfig().registryModuleOwnerCustom,
+            token: 0x0000000000000000000000000000000000000000, 
+            pool: 0x0000000000000000000000000000000000000000
+        }));
+
+        networks.push(NetworkDetails({
+            name: "BNBChain",
+            chainId: 56,
+            chainSelector: helperConfig.getBNBChainConfig().chainSelector,
+            routerAddress: helperConfig.getBNBChainConfig().router,
+            linkAddress: helperConfig.getBNBChainConfig().link,
+            rmnProxyAddress: helperConfig.getBNBChainConfig().rmnProxy,
+            tokenAdminRegistryAddress: helperConfig.getBNBChainConfig().tokenAdminRegistry,
+            registryModuleOwnerCustomAddress: helperConfig.getBNBChainConfig().registryModuleOwnerCustom,
+            token: 0x0000000000000000000000000000000000000000,
+            pool: 0x0000000000000000000000000000000000000000
+        }));
+
+        networks.push(NetworkDetails({
+            name: "Optimism",
+            chainId: 10,
+            chainSelector: helperConfig.getOptimismConfig().chainSelector,
+            routerAddress: helperConfig.getOptimismConfig().router,
+            linkAddress: helperConfig.getOptimismConfig().link,
+            rmnProxyAddress: helperConfig.getOptimismConfig().rmnProxy,
+            tokenAdminRegistryAddress: helperConfig.getOptimismConfig().tokenAdminRegistry,
+            registryModuleOwnerCustomAddress: helperConfig.getOptimismConfig().registryModuleOwnerCustom,
+            token: 0x0000000000000000000000000000000000000000,
+            pool: 0x0000000000000000000000000000000000000000
+        }));
+
+        networks.push(NetworkDetails({
+            name: "Polygon",
+            chainId: 137,
+            chainSelector: helperConfig.getPolygonConfig().chainSelector,
+            routerAddress: helperConfig.getPolygonConfig().router,
+            linkAddress: helperConfig.getPolygonConfig().link,
+            rmnProxyAddress: helperConfig.getPolygonConfig().rmnProxy,
+            tokenAdminRegistryAddress: helperConfig.getPolygonConfig().tokenAdminRegistry,
+            registryModuleOwnerCustomAddress: helperConfig.getPolygonConfig().registryModuleOwnerCustom,
+            token: 0x0000000000000000000000000000000000000000,
+            pool: 0x0000000000000000000000000000000000000000
+        }));
+
+        networks.push(NetworkDetails({
+            name: "MetisMainnet",
+            chainId: 1088,
+            chainSelector: helperConfig.getMetisMainnetConfig().chainSelector,
+            routerAddress: helperConfig.getMetisMainnetConfig().router,
+            linkAddress: helperConfig.getMetisMainnetConfig().link,
+            rmnProxyAddress: helperConfig.getMetisMainnetConfig().rmnProxy,
+            tokenAdminRegistryAddress: helperConfig.getMetisMainnetConfig().tokenAdminRegistry,
+            registryModuleOwnerCustomAddress: helperConfig.getMetisMainnetConfig().registryModuleOwnerCustom,
+            token: 0x0000000000000000000000000000000000000000,
+            pool: 0x0000000000000000000000000000000000000000
+        }));
+
+        networks.push(NetworkDetails({
+            name: "SeiMainnet",
+            chainId: 1329,
+            chainSelector: helperConfig.getSeiMainnetConfig().chainSelector,
+            routerAddress: helperConfig.getSeiMainnetConfig().router,
+            linkAddress: helperConfig.getSeiMainnetConfig().link,
+            rmnProxyAddress: helperConfig.getSeiMainnetConfig().rmnProxy,
+            tokenAdminRegistryAddress: helperConfig.getSeiMainnetConfig().tokenAdminRegistry,
+            registryModuleOwnerCustomAddress: helperConfig.getSeiMainnetConfig().registryModuleOwnerCustom,
+            token: 0x0000000000000000000000000000000000000000,
+            pool: 0x0000000000000000000000000000000000000000
+        }));
+
+        networks.push(NetworkDetails({
+            name: "CeloMainnet",
+            chainId: 42220,
+            chainSelector: helperConfig.getCeloMainnetConfig().chainSelector,
+            routerAddress: helperConfig.getCeloMainnetConfig().router,
+            linkAddress: helperConfig.getCeloMainnetConfig().link,
+            rmnProxyAddress: helperConfig.getCeloMainnetConfig().rmnProxy,
+            tokenAdminRegistryAddress: helperConfig.getCeloMainnetConfig().tokenAdminRegistry,
+            registryModuleOwnerCustomAddress: helperConfig.getCeloMainnetConfig().registryModuleOwnerCustom,
+            token: 0x0000000000000000000000000000000000000000,
+            pool: 0x0000000000000000000000000000000000000000
+        }));
+
+        networks.push(NetworkDetails({
+            name: "RoninMainnet",
+            chainId: 2020,
+            chainSelector: helperConfig.getRoninMainnetConfig().chainSelector,
+            routerAddress: helperConfig.getRoninMainnetConfig().router,
+            linkAddress: helperConfig.getRoninMainnetConfig().link,
+            rmnProxyAddress: helperConfig.getRoninMainnetConfig().rmnProxy,
+            tokenAdminRegistryAddress: helperConfig.getRoninMainnetConfig().tokenAdminRegistry,
+            registryModuleOwnerCustomAddress: helperConfig.getRoninMainnetConfig().registryModuleOwnerCustom,
+            token: 0x0000000000000000000000000000000000000000,
+            pool: 0x0000000000000000000000000000000000000000
+        }));
+
+
+        //testnets configurations ///
+
+        // networks.push(NetworkDetails({
+        //     name: "EthereumSepolia",
+        //     chainId: 11155111,
+        //     chainSelector: helperConfig.getEthereumSepoliaConfig().chainSelector,
+        //     routerAddress: helperConfig.getEthereumSepoliaConfig().router,
+        //     linkAddress: helperConfig.getEthereumSepoliaConfig().link,
+        //     rmnProxyAddress: helperConfig.getEthereumSepoliaConfig().rmnProxy,
+        //     tokenAdminRegistryAddress: helperConfig.getEthereumSepoliaConfig().tokenAdminRegistry,
+        //     registryModuleOwnerCustomAddress: helperConfig.getEthereumSepoliaConfig().registryModuleOwnerCustom,
+        //     token: 0x44bbe76BA377526ff6F5FA3e2F06455a7EA2F4a0,
+        //     pool: 0xC459b032cFaD9988e0eF174f7872A2D68f6879BE
+        // }));
+
+        // networks.push(NetworkDetails({
+        //     name: "ArbitrumSepolia",
+        //     chainId: 421614,
+        //     chainSelector: helperConfig.getArbitrumSepolia().chainSelector,
+        //     routerAddress: helperConfig.getArbitrumSepolia().router,
+        //     linkAddress: helperConfig.getArbitrumSepolia().link,
+        //     rmnProxyAddress: helperConfig.getArbitrumSepolia().rmnProxy,
+        //     tokenAdminRegistryAddress: helperConfig.getArbitrumSepolia().tokenAdminRegistry,
+        //     registryModuleOwnerCustomAddress: helperConfig.getArbitrumSepolia().registryModuleOwnerCustom,
+        //     token: 0x00A65eFa887A2E6b822DD613d8272788F3b40f5d,
+        //     pool: 0x5b27E1BE18523Fcf28B2Dfdc73CbCa267FAF5859
+        // }));
+        // networks.push(NetworkDetails({
+        //     name: "BSCTestnet",
+        //     chainId: 97,
+        //     chainSelector: helperConfig.getBSCTestnetConfig().chainSelector,
+        //     routerAddress: helperConfig.getBSCTestnetConfig().router,
+        //     linkAddress: helperConfig.getBSCTestnetConfig().link,
+        //     rmnProxyAddress: helperConfig.getBSCTestnetConfig().rmnProxy,
+        //     tokenAdminRegistryAddress: helperConfig.getBSCTestnetConfig().tokenAdminRegistry,
+        //     registryModuleOwnerCustomAddress: helperConfig.getBSCTestnetConfig().registryModuleOwnerCustom,
+        //     token: 0x5436FDbE11CCA6c70f80c1f160e636859b4D7493,
+        //     pool:  0x5adad530492e7B0228B31e4935Fb6c3227A46412
+        // }));
 
     //     networks.push(NetworkDetails({
     //     name: "UnichainSepolia",
@@ -87,11 +234,11 @@ contract BaseScript is Script {
         
     }
 
-    function deployToken() internal returns (phoneToken) {
-        phoneToken token = new phoneToken(address(owner));
+    function deployToken() internal returns (MiddleEastECommerce) {
+        MiddleEastECommerce token = new MiddleEastECommerce(address(owner));
         console.log("Deployed Token:", address(token));
         grantRoles(address(token),msg.sender);
-        phoneToken(token).addToWhitelist(address(msg.sender));
+        token.addToWhitelist(msg.sender);
         return token;
     }
 
@@ -104,18 +251,19 @@ contract BaseScript is Script {
             rmnProxy,
             router
         );
-        phoneToken(token).addToWhitelist(address(pool));
+        MiddleEastECommerce(token).addToWhitelist(address(pool));
+        MiddleEastECommerce(token).setTokenPool(address(pool));
         console.log("Deployed Pool:", address(pool));
         return pool;
     }
 
     function grantRoles(address token, address pool) internal {
-        phoneToken(token).grantRole(
-            phoneToken(token).MINTER_ROLE(),
+        MiddleEastECommerce(token).grantRole(
+            MiddleEastECommerce(token).MINTER_ROLE(),
             pool
         );
-        phoneToken(token).grantRole(
-            phoneToken(token).BURNER_ROLE(),
+        MiddleEastECommerce(token).grantRole(
+            MiddleEastECommerce(token).BURNER_ROLE(),
             pool
         );
         console.log("Roles Granted to Pool:", pool);

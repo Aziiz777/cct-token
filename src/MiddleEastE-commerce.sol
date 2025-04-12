@@ -1,13 +1,16 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.24;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
+import {BurnMintTokenPool} from "@chainlink-ccip/contracts-ccip/src/v0.8/ccip/pools/BurnMintTokenPool.sol"; 
 import {IBurnMintERC20} from "./interface/IBurnMintERC20.sol";
 
-contract phoneToken is ERC20, ERC20Burnable, AccessControl, IBurnMintERC20 {
-    address private immutable i_CCIPAdmin;
+contract MiddleEastECommerce is ERC20Burnable, AccessControl, IBurnMintERC20 {
+    address internal  s_CCIPAdmin;
+    BurnMintTokenPool public  CCIPTokenPool;
+
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
     bytes32 public constant BURNER_ROLE = keccak256("BURNER_ROLE");
 
@@ -28,21 +31,32 @@ contract phoneToken is ERC20, ERC20Burnable, AccessControl, IBurnMintERC20 {
     // Whitelist mapping
     mapping(address => bool) public isWhitelisted;
 
-    constructor(address admin) ERC20("phone", "ph") {
-        i_CCIPAdmin = msg.sender; // CCIP admin is the deployer
+    uint256 private constant ETHEREUM_MAINNET_CHAIN_ID = 1;
+
+    constructor(address admin) ERC20("Middle East E-Commerce", "ME") {
+        s_CCIPAdmin = admin;
         feeRecipient = admin;
 
         // Set up roles
-        _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
+        _grantRole(DEFAULT_ADMIN_ROLE, admin);
         _grantRole(MINTER_ROLE, admin);
         _grantRole(BURNER_ROLE, admin);
 
         // Whitelist the admin
         isWhitelisted[admin] = true;
 
-        // Initial mint of 15% to admin
-        _mint(admin, INITIAL_MINT);
-        lastMintTimestamp = block.timestamp;
+        // Initial mint only on Ethereum
+        if (block.chainid == ETHEREUM_MAINNET_CHAIN_ID) {
+            _mint(admin, INITIAL_MINT);
+            lastMintTimestamp = block.timestamp;
+        }
+
+    }
+
+    // Modifier to restrict access to only the token pool
+    modifier onlyTokenPool(address caller) {
+        require(caller == address(CCIPTokenPool), "Caller is not the token pool");
+        _;
     }
 
     function maxSupply() public pure returns (uint256) {
@@ -58,8 +72,15 @@ contract phoneToken is ERC20, ERC20Burnable, AccessControl, IBurnMintERC20 {
         isWhitelisted[account] = false;
     }
 
-    // Mint function with monthly limit
-    function mint(address account, uint256 amount) public onlyRole(MINTER_ROLE) {
+    // Mint function without monthly limit for the cross chain pool
+    function mint(address account, uint256 amount) public onlyTokenPool(msg.sender) {
+        require(totalSupply() + amount <= MAX_SUPPLY, "Mint would exceed max supply");
+        _mint(account, amount);
+    }
+
+    // Mint function with monthly limit for the token owner
+    function ownerMint(address account, uint256 amount) public onlyRole(MINTER_ROLE) {
+        require(block.chainid == ETHEREUM_MAINNET_CHAIN_ID, "Owner minting only allowed on Ethereum");
         require(totalSupply() + amount <= MAX_SUPPLY, "Mint would exceed max supply");
         
         // Check if a new month has started
@@ -88,19 +109,8 @@ contract phoneToken is ERC20, ERC20Burnable, AccessControl, IBurnMintERC20 {
         burnFrom(account, amount);
     }
 
-    // Getter for CCIP admin
-    function getCCIPAdmin() public view returns (address) {
-        return i_CCIPAdmin;
-    }
-
-    // Set fee recipient
-    function setFeeRecipient(address _feeRecipient) public onlyRole(DEFAULT_ADMIN_ROLE) {
-        require(_feeRecipient != address(0), "Invalid fee recipient");
-        feeRecipient = _feeRecipient;
-    }
-
     // Custom transfer function with fee and whitelist check
-    function transferWithFee(address recipient, uint256 amount) public returns (bool) {
+    function transferWithFee(address recipient, uint256 amount) internal returns (bool) {
         require(recipient != address(0), "ERC20: transfer to the zero address");
 
         if (isWhitelisted[msg.sender] || isWhitelisted[recipient]) {
@@ -141,11 +151,39 @@ contract phoneToken is ERC20, ERC20Burnable, AccessControl, IBurnMintERC20 {
         return true;
     }
 
+    // Set ccip token pool for bridging 
+    function setTokenPool(address _tokenPool) public onlyRole(DEFAULT_ADMIN_ROLE) {
+        require(_tokenPool != address(0), "Invalid pool address");
+        require(address(CCIPTokenPool) == address(0), "Token pool already set"); // Prevent resetting
+        BurnMintTokenPool pool = BurnMintTokenPool(_tokenPool);
+        require(address(pool.getToken()) == address(this));
+        CCIPTokenPool = pool;
+    }
+    /// @notice Transfers the CCIPAdmin role to a new address
+    /// @dev only the owner can call this function, NOT the current ccipAdmin, and 1-step ownership transfer is used.
+    /// @param newAdmin The address to transfer the CCIPAdmin role to. Setting to address(0) is a valid way to revoke
+    /// the role
+    function setCCIPAdmin(address newAdmin) public onlyRole(DEFAULT_ADMIN_ROLE) {
+        require(newAdmin != address(0), "Invalid ccip Admin");
+
+        s_CCIPAdmin = newAdmin;
+    }
+
+    // Set fee recipient
+    function setFeeRecipient(address _feeRecipient) public onlyRole(DEFAULT_ADMIN_ROLE) {
+        require(_feeRecipient != address(0), "Invalid fee recipient");
+        feeRecipient = _feeRecipient;
+    }
+
     // Function to check remaining monthly mint allowance
     function getRemainingMonthlyMint() public view returns (uint256) {
         if (block.timestamp >= lastMintTimestamp + MONTH_DURATION) {
             return MONTHLY_MINT_LIMIT;
         }
         return MONTHLY_MINT_LIMIT - monthlyMintedAmount;
+    }
+    // Getter for CCIP admin
+    function getCCIPAdmin() public view returns (address) {
+        return s_CCIPAdmin;
     }
 }

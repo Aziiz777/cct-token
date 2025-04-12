@@ -9,7 +9,7 @@ import "@chainlink/contracts-ccip/src/v0.8/ccip/libraries/Client.sol";
 
 contract TransferTokens is BaseScript {
     // Hardcode source and destination chains for this example
-    string sourceChainName = "ArbitrumSepolia";
+    string sourceChainName = "EthereumSepolia";
     // string sourceChainName = "BSCTestnet";
     string destinationChainName = "BSCTestnet";
     // string destinationChainName = "ArbitrumSepolia";
@@ -17,7 +17,7 @@ contract TransferTokens is BaseScript {
     function run() external {
         address sender = address(0xAE1710C414E95B83c247E01E8F30eE117771599B);
         address receiver = address(0xAE1710C414E95B83c247E01E8F30eE117771599B); // Destination address on Arbitrum Sepolia
-        uint256 amount = 1000; // Amount to transfer (in wei, e.g., 100 * 10^18)
+        uint256 amount = 1000000000000000000000; // Amount to transfer (in wei)
 
         console.log("Sender:", sender);
         console.log("Receiver:", receiver);

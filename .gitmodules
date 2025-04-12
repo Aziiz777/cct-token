@@ -13,3 +13,9 @@
 [submodule "lib/v2-periphery"]
 	path = lib/v2-periphery
 	url = https://github.com/uniswap/v2-periphery
+[submodule "lib/pancake-swap-core"]
+	path = lib/pancake-swap-core
+	url = https://github.com/pancakeswap/pancake-swap-core
+[submodule "lib/pancake-swap-periphery"]
+	path = lib/pancake-swap-periphery
+	url = https://github.com/pancakeswap/pancake-swap-periphery

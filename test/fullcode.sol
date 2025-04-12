@@ -4,7 +4,7 @@
 pragma solidity ^0.8.0;
 
 import { Test, Vm } from "forge-std/Test.sol";
-import { phoneToken} from "./phone.sol";
+import { MiddleEastECommerce} from "../src/MiddleEastE-commerce.sol";
 import "forge-std/console.sol";
 import {CCIPLocalSimulatorFork,IRouterFork, Register} from "@chainlink-local/local/src/ccip/CCIPLocalSimulatorFork.sol";
 import { BurnMintTokenPool, TokenPool } from "@chainlink-local/contracts-ccip/src/v0.8/ccip/pools/BurnMintTokenPool.sol";
@@ -59,11 +59,11 @@ contract MockERC20BurnAndMintToken is IBurnMintERC20, ERC20Burnable, AccessContr
 
 contract CCIPv1_5BurnMintPoolFork is Test {
   CCIPLocalSimulatorFork public ccipLocalSimulatorFork;
-  phoneToken public mockERC20TokenEthSepolia;
-  phoneToken public mockERC20TokenBaseSepolia;
-  phoneToken public mockERC20TokenOptimismSepolia;
-  phoneToken public mockERC20TokenZkSyncSepolia;
-  phoneToken public mockERC20TokenArbitrumSepolia;
+  MiddleEastECommerce public mockERC20TokenEthSepolia;
+  MiddleEastECommerce public mockERC20TokenBaseSepolia;
+  MiddleEastECommerce public mockERC20TokenOptimismSepolia;
+  MiddleEastECommerce public mockERC20TokenZkSyncSepolia;
+  MiddleEastECommerce public mockERC20TokenArbitrumSepolia;
   BurnMintTokenPool public burnMintTokenPoolEthSepolia;
   BurnMintTokenPool public burnMintTokenPoolBaseSepolia;
   BurnMintTokenPool public burnMintTokenPoolOptimismSepolia;
@@ -118,35 +118,36 @@ function setUp() public {
     vm.selectFork(ethSepoliaFork);
     vm.startPrank(aliceEth);
     vm.deal(aliceEth, 1 ether);
-    mockERC20TokenEthSepolia = new phoneToken(address(aliceEth));
-    // phoneToken(mockERC20TokenEthSepolia).initialize(address(aliceEth));
-    console.log("Eth Sepolia Token Deployed:", address(mockERC20TokenEthSepolia));
     ccipLocalSimulatorFork = new CCIPLocalSimulatorFork();
     vm.makePersistent(address(ccipLocalSimulatorFork));
+    ethSepoliaNetworkDetails = ccipLocalSimulatorFork.getNetworkDetails(block.chainid);
+    mockERC20TokenEthSepolia = new MiddleEastECommerce(address(aliceEth));
+    // phoneToken(mockERC20TokenEthSepolia).initialize(address(aliceEth));
+    console.log("Eth Sepolia Token Deployed:", address(mockERC20TokenEthSepolia));
     console.log("CCIP Simulator Deployed:", address(ccipLocalSimulatorFork));
     vm.stopPrank();
 
     vm.selectFork(baseSepoliaFork);
     vm.startPrank(aliceBase);
     vm.deal(aliceBase, 1 ether);
-    mockERC20TokenBaseSepolia = new phoneToken(address(aliceBase));
-    // phoneToken(mockERC20TokenBaseSepolia).initialize(address(aliceBase));
+    baseSepoliaNetworkDetails = ccipLocalSimulatorFork.getNetworkDetails(block.chainid);
+    mockERC20TokenBaseSepolia = new MiddleEastECommerce(address(aliceBase));
     console.log("Base Sepolia Token Deployed:", address(mockERC20TokenBaseSepolia));
     vm.stopPrank();
 
     vm.selectFork(optimismSepoliaFork);
     vm.startPrank(aliceOptimism);
     vm.deal(aliceOptimism, 1 ether);
-    mockERC20TokenOptimismSepolia = new phoneToken(address(aliceOptimism));
-    // phoneToken(mockERC20TokenOptimismSepolia).initialize(address(aliceOptimism));
+    optimismSepoliaNetworkDetails = ccipLocalSimulatorFork.getNetworkDetails(block.chainid);
+    mockERC20TokenOptimismSepolia = new MiddleEastECommerce(address(aliceOptimism));
     console.log("Optimism Sepolia Token Deployed:", address(mockERC20TokenOptimismSepolia));
     vm.stopPrank();
 
     vm.selectFork(zkSyncSepoliaFork);
     vm.startPrank(aliceZk);
     vm.deal(aliceZk, 1 ether);
-    mockERC20TokenZkSyncSepolia = new phoneToken(address(aliceZk));
-    // phoneToken(mockERC20TokenZkSyncSepolia).initialize(address(aliceZk));
+    zkSyncSepoliaDetails = ccipLocalSimulatorFork.getNetworkDetails(block.chainid);
+    mockERC20TokenZkSyncSepolia = new MiddleEastECommerce(address(aliceZk));
     console.log("zkSync Sepolia Token Deployed:", address(mockERC20TokenZkSyncSepolia));
 
     vm.stopPrank();
@@ -154,8 +155,8 @@ function setUp() public {
     vm.selectFork(arbitrumSepoliaFork);
     vm.startPrank(aliceArbitrum);
     vm.deal(aliceArbitrum, 1 ether);
-    mockERC20TokenArbitrumSepolia = new phoneToken(address(aliceArbitrum));
-    // phoneToken(mockERC20TokenArbitrumSepolia).initialize(address(aliceArbitrum));
+    arbitrumSepoliaDetails = ccipLocalSimulatorFork.getNetworkDetails(block.chainid);
+    mockERC20TokenArbitrumSepolia = new MiddleEastECommerce(address(aliceArbitrum));
     console.log("zkSync Sepolia Token Deployed:", address(mockERC20TokenArbitrumSepolia));
 
     vm.stopPrank();
@@ -350,16 +351,6 @@ function setUp() public {
 
 function test_forkSupportNewCCIPToken2() public {
     // Steps 1-3: Deploy BurnMintTokenPools with unique deployers
-    vm.selectFork(ethSepoliaFork);
-    ethSepoliaNetworkDetails = ccipLocalSimulatorFork.getNetworkDetails(block.chainid);
-    vm.selectFork(baseSepoliaFork);
-    baseSepoliaNetworkDetails = ccipLocalSimulatorFork.getNetworkDetails(block.chainid);
-    vm.selectFork(optimismSepoliaFork);
-    optimismSepoliaNetworkDetails = ccipLocalSimulatorFork.getNetworkDetails(block.chainid);
-    vm.selectFork(zkSyncSepoliaFork);
-    zkSyncSepoliaDetails = ccipLocalSimulatorFork.getNetworkDetails(block.chainid);
-    vm.selectFork(arbitrumSepoliaFork);
-    arbitrumSepoliaDetails = ccipLocalSimulatorFork.getNetworkDetails(block.chainid);
 
     burnMintTokenPoolEthSepolia = deployTokenPool(
         ethSepoliaFork,
@@ -368,7 +359,8 @@ function test_forkSupportNewCCIPToken2() public {
         ethSepoliaNetworkDetails.rmnProxyAddress,
         ethSepoliaNetworkDetails.routerAddress
     );
-    phoneToken(mockERC20TokenEthSepolia).addToWhitelist(address(burnMintTokenPoolEthSepolia));
+    MiddleEastECommerce(mockERC20TokenEthSepolia).addToWhitelist(address(burnMintTokenPoolEthSepolia));
+    MiddleEastECommerce(mockERC20TokenEthSepolia).setTokenPool(address(burnMintTokenPoolEthSepolia));
     burnMintTokenPoolBaseSepolia = deployTokenPool(
         baseSepoliaFork,
         aliceBase,
@@ -376,7 +368,8 @@ function test_forkSupportNewCCIPToken2() public {
         baseSepoliaNetworkDetails.rmnProxyAddress,
         baseSepoliaNetworkDetails.routerAddress
     );
-    phoneToken(mockERC20TokenBaseSepolia).addToWhitelist(address(burnMintTokenPoolBaseSepolia));
+    MiddleEastECommerce(mockERC20TokenBaseSepolia).addToWhitelist(address(burnMintTokenPoolBaseSepolia));
+    MiddleEastECommerce(mockERC20TokenBaseSepolia).setTokenPool(address(burnMintTokenPoolBaseSepolia));
 
     burnMintTokenPoolOptimismSepolia = deployTokenPool(
         optimismSepoliaFork,
@@ -385,7 +378,8 @@ function test_forkSupportNewCCIPToken2() public {
         optimismSepoliaNetworkDetails.rmnProxyAddress,
         optimismSepoliaNetworkDetails.routerAddress
     );
-    phoneToken(mockERC20TokenOptimismSepolia).addToWhitelist(address(burnMintTokenPoolOptimismSepolia));
+    MiddleEastECommerce(mockERC20TokenOptimismSepolia).addToWhitelist(address(burnMintTokenPoolOptimismSepolia));
+    MiddleEastECommerce(mockERC20TokenOptimismSepolia).setTokenPool(address(burnMintTokenPoolOptimismSepolia));
 
 
     burnMintTokenPoolZkSyncSepolia = deployTokenPool(
@@ -395,7 +389,8 @@ function test_forkSupportNewCCIPToken2() public {
         zkSyncSepoliaDetails.rmnProxyAddress,
         zkSyncSepoliaDetails.routerAddress
     );
-    phoneToken(mockERC20TokenZkSyncSepolia).addToWhitelist(address(burnMintTokenPoolZkSyncSepolia));
+    MiddleEastECommerce(mockERC20TokenZkSyncSepolia).addToWhitelist(address(burnMintTokenPoolZkSyncSepolia));
+    MiddleEastECommerce(mockERC20TokenZkSyncSepolia).setTokenPool(address(burnMintTokenPoolZkSyncSepolia));
 
     burnMintTokenPoolArbitrumSepolia = deployTokenPool(
         arbitrumSepoliaFork,
@@ -404,7 +399,8 @@ function test_forkSupportNewCCIPToken2() public {
         arbitrumSepoliaDetails.rmnProxyAddress,
         arbitrumSepoliaDetails.routerAddress
     );
-    phoneToken(mockERC20TokenArbitrumSepolia).addToWhitelist(address(burnMintTokenPoolArbitrumSepolia));
+    MiddleEastECommerce(mockERC20TokenArbitrumSepolia).addToWhitelist(address(burnMintTokenPoolArbitrumSepolia));
+    MiddleEastECommerce(mockERC20TokenArbitrumSepolia).setTokenPool(address(burnMintTokenPoolArbitrumSepolia));
 
 
     // Verify unique addresses
@@ -422,7 +418,7 @@ function test_forkSupportNewCCIPToken2() public {
     require(address(mockERC20TokenEthSepolia) != address(mockERC20TokenOptimismSepolia), "Eth and Optimism tokens must differ");
     require(address(mockERC20TokenEthSepolia) != address(mockERC20TokenZkSyncSepolia), "Eth and ZkSync tokens must differ");
     require(address(mockERC20TokenEthSepolia) != address(mockERC20TokenArbitrumSepolia), "Eth and Arbitrum tokens must differ");
-
+ 
     require(address(mockERC20TokenBaseSepolia) != address(mockERC20TokenOptimismSepolia), "Base and Optimism tokens must differ");
     require(address(mockERC20TokenBaseSepolia) != address(mockERC20TokenZkSyncSepolia), "Base and ZkSync tokens must differ");
     require(address(mockERC20TokenZkSyncSepolia) != address(mockERC20TokenOptimismSepolia), "ZkSync and Optimism tokens must differ");
@@ -592,7 +588,7 @@ function test_forkSupportNewCCIPToken2() public {
     ccipLocalSimulatorFork.requestLinkFromFaucet(aliceEth, 20 ether);
     vm.startPrank(aliceEth);
     uint256 amountToSend = 100;
-    mockERC20TokenEthSepolia.mint(aliceEth, amountToSend * 4);
+    mockERC20TokenEthSepolia.ownerMint(aliceEth, amountToSend * 4);
     console.log("Eth Sepolia - Initial Alice Balance:", mockERC20TokenEthSepolia.balanceOf(aliceEth));
     vm.selectFork(baseSepoliaFork);
     console.log("Base Sepolia - Initial Alice Balance:", mockERC20TokenBaseSepolia.balanceOf(aliceBase));
@@ -753,6 +749,167 @@ function test_forkSupportNewCCIPToken2() public {
     assertEq(mockERC20TokenEthSepolia.balanceOf(aliceEth), balanceBeforeEth);
 }
 
+// function test_CrossChainTransferEthToBase() public {
+//     // Step 1: Deploy and configure token pools
+//     burnMintTokenPoolEthSepolia = deployTokenPool(
+//         ethSepoliaFork,
+//         aliceEth,
+//         address(mockERC20TokenEthSepolia),
+//         ethSepoliaNetworkDetails.rmnProxyAddress,
+//         ethSepoliaNetworkDetails.routerAddress
+//     );
+//     mockERC20TokenEthSepolia.setTokenPool(address(burnMintTokenPoolEthSepolia));
+//     mockERC20TokenEthSepolia.addToWhitelist(address(burnMintTokenPoolEthSepolia));
+//     vm.stopPrank();
+    
+//     burnMintTokenPoolBaseSepolia = deployTokenPool(
+//         baseSepoliaFork,
+//         aliceBase,
+//         address(mockERC20TokenBaseSepolia),
+//         baseSepoliaNetworkDetails.rmnProxyAddress,
+//         baseSepoliaNetworkDetails.routerAddress
+//     );
+//     mockERC20TokenBaseSepolia.setTokenPool(address(burnMintTokenPoolBaseSepolia));
+//     mockERC20TokenBaseSepolia.addToWhitelist(address(burnMintTokenPoolBaseSepolia));
+//     vm.stopPrank();
+
+//     // Step 2: Grant roles for pools
+//     grantRoles(ethSepoliaFork, aliceEth, payable(mockERC20TokenEthSepolia), address(burnMintTokenPoolEthSepolia));
+//     grantRoles(baseSepoliaFork, aliceBase, payable(mockERC20TokenBaseSepolia), address(burnMintTokenPoolBaseSepolia));
+
+//     // Step 3: Configure admin and link pools
+//     setupAdminAndPool(
+//         ethSepoliaFork,
+//         aliceEth,
+//         address(mockERC20TokenEthSepolia),
+//         address(burnMintTokenPoolEthSepolia),
+//         ethSepoliaNetworkDetails.registryModuleOwnerCustomAddress,
+//         ethSepoliaNetworkDetails.tokenAdminRegistryAddress
+//     );
+//     setupAdminAndPool(
+//         baseSepoliaFork,
+//         aliceBase,
+//         address(mockERC20TokenBaseSepolia),
+//         address(burnMintTokenPoolBaseSepolia),
+//         baseSepoliaNetworkDetails.registryModuleOwnerCustomAddress,
+//         baseSepoliaNetworkDetails.tokenAdminRegistryAddress
+//     );
+
+//     // Step 4: Configure pool chain updates
+//     uint64[] memory ethRemoteChains = new uint64[](1);
+//     address[] memory ethRemotePools = new address[](1);
+//     address[] memory ethRemoteTokens = new address[](1);
+//     ethRemoteChains[0] = baseSepoliaNetworkDetails.chainSelector;
+//     ethRemotePools[0] = address(burnMintTokenPoolBaseSepolia);
+//     ethRemoteTokens[0] = address(mockERC20TokenBaseSepolia);
+//     configurePool(ethSepoliaFork, aliceEth, address(burnMintTokenPoolEthSepolia), ethRemoteChains, ethRemotePools, ethRemoteTokens);
+
+//     uint64[] memory baseRemoteChains = new uint64[](1);
+//     address[] memory baseRemotePools = new address[](1);
+//     address[] memory baseRemoteTokens = new address[](1);
+//     baseRemoteChains[0] = ethSepoliaNetworkDetails.chainSelector;
+//     baseRemotePools[0] = address(burnMintTokenPoolEthSepolia);
+//     baseRemoteTokens[0] = address(mockERC20TokenEthSepolia);
+//     configurePool(baseSepoliaFork, aliceBase, address(burnMintTokenPoolBaseSepolia), baseRemoteChains, baseRemotePools, baseRemoteTokens);
+
+//     // Step 5: Test crossChainTransfer (non-whitelisted sender)
+//     vm.selectFork(ethSepoliaFork);
+//     vm.startPrank(aliceEth);
+//     uint256 amountToSend = 1000; // 1000 tokens
+//     uint256 feeAmount = (amountToSend * mockERC20TokenEthSepolia.FEE_BASIS_POINTS()) / mockERC20TokenEthSepolia.BASIS_POINTS_DENOMINATOR(); // 1% = 10 tokens
+//     uint256 transferAmount = amountToSend - feeAmount; // 990 tokens
+
+//     // Mint tokens for aliceEth
+//     mockERC20TokenEthSepolia.ownerMint(aliceEth, amountToSend);
+//     uint256 balanceBeforeEth = mockERC20TokenEthSepolia.balanceOf(aliceEth);
+//     uint256 feeRecipientBalanceBefore = mockERC20TokenEthSepolia.balanceOf(aliceEth); // feeRecipient is aliceEth
+
+//     // Estimate CCIP fee
+//     Client.EVM2AnyMessage memory message = Client.EVM2AnyMessage({
+//         receiver: abi.encode(aliceEth),
+//         data:"",
+//         tokenAmounts: new Client.EVMTokenAmount[](1),
+//         feeToken: address(0),
+//         extraArgs: abi.encodePacked(
+//                 bytes4(keccak256("CCIP EVMExtraArgsV1")),
+//                 abi.encode(uint256(0))
+//             )
+//     });
+//     message.tokenAmounts[0] = Client.EVMTokenAmount({
+//         token: address(mockERC20TokenEthSepolia),
+//         amount: transferAmount
+//     });
+//     uint256 ccipFee = IRouterClient(ethSepoliaNetworkDetails.routerAddress).getFee(
+//         baseSepoliaNetworkDetails.chainSelector,
+//         message
+//     );
+
+//     // Deal ETH for fees
+//     vm.deal(aliceEth, ccipFee * 2);
+
+//     // Expect event
+//     vm.expectEmit(true, true, true, true);
+
+//     // Call crossChainTransfer
+//     bytes32 messageId = mockERC20TokenEthSepolia.crossChainTransfer{value: ccipFee}(
+//         baseSepoliaNetworkDetails.chainSelector,
+//         aliceBase,
+//         amountToSend
+//     );
+
+//     // Verify source chain balances
+//     uint256 balanceAfterEth = mockERC20TokenEthSepolia.balanceOf(aliceEth);
+//     uint256 poolBalance = mockERC20TokenEthSepolia.balanceOf(address(burnMintTokenPoolEthSepolia));
+//     uint256 feeRecipientBalanceAfter = mockERC20TokenEthSepolia.balanceOf(aliceEth);
+//     assertEq(balanceAfterEth, balanceBeforeEth - amountToSend, "Alice balance incorrect after transfer");
+//     assertEq(poolBalance, transferAmount, "Pool balance incorrect");
+//     assertEq(
+//         feeRecipientBalanceAfter,
+//         feeRecipientBalanceBefore,
+//         "Fee recipient balance incorrect"
+//     );
+
+//     vm.stopPrank();
+
+//     // Step 6: Route message to Base Sepolia
+//     ccipLocalSimulatorFork.switchChainAndRouteMessage(baseSepoliaFork);
+
+//     // Step 7: Verify destination chain
+//     vm.selectFork(baseSepoliaFork);
+//     uint256 balanceBase = mockERC20TokenBaseSepolia.balanceOf(aliceBase);
+//     assertEq(balanceBase, transferAmount, "Receiver balance incorrect on Base");
+
+//     // Step 8: Test with whitelisted sender
+//     vm.selectFork(ethSepoliaFork);
+//     vm.startPrank(aliceEth);
+//     mockERC20TokenEthSepolia.addToWhitelist(aliceEth);
+//     mockERC20TokenEthSepolia.ownerMint(aliceEth, amountToSend);
+//     balanceBeforeEth = mockERC20TokenEthSepolia.balanceOf(aliceEth);
+
+//     // Call crossChainTransfer (no fee expected)
+//     messageId = mockERC20TokenEthSepolia.crossChainTransfer{value: ccipFee}(
+//         baseSepoliaNetworkDetails.chainSelector,
+//         aliceBase,
+//         amountToSend
+//     );
+
+//     // Verify no fee deducted
+//     balanceAfterEth = mockERC20TokenEthSepolia.balanceOf(aliceEth);
+//     poolBalance = mockERC20TokenEthSepolia.balanceOf(address(burnMintTokenPoolEthSepolia));
+//     assertEq(balanceAfterEth, balanceBeforeEth - amountToSend, "Alice balance incorrect (whitelisted)");
+//     assertEq(poolBalance, amountToSend * 2, "Pool balance incorrect (whitelisted)");
+
+//     vm.stopPrank();
+
+//     // Step 9: Route message
+//     ccipLocalSimulatorFork.switchChainAndRouteMessage(baseSepoliaFork);
+
+//     // Step 10: Verify destination chain (whitelisted)
+//     vm.selectFork(baseSepoliaFork);
+//     balanceBase = mockERC20TokenBaseSepolia.balanceOf(aliceBase);
+//     assertEq(balanceBase, transferAmount + amountToSend, "Receiver balance incorrect on Base (whitelisted)");
+// }
+
 // Helper: Deploy a BurnMintTokenPool
 function deployTokenPool(
     uint256 fork,
@@ -779,12 +936,12 @@ function deployTokenPool(
 function grantRoles(uint256 fork, address deployer, address token, address pool) internal {
     vm.selectFork(fork);
     vm.startPrank(deployer);
-    phoneToken(token).grantRole(
-        phoneToken(token).MINTER_ROLE(),
+    MiddleEastECommerce(token).grantRole(
+        MiddleEastECommerce(token).MINTER_ROLE(),
         pool
     );
-    phoneToken(token).grantRole(
-        phoneToken(token).BURNER_ROLE(),
+    MiddleEastECommerce(token).grantRole(
+        MiddleEastECommerce(token).BURNER_ROLE(),
         pool
     );
     console.log("Chain", fork, "Minter Role Granted to Pool:", pool);
@@ -852,7 +1009,7 @@ function sendTokens(
     vm.startPrank(sender);
 
     // Approve the router to spend the token being transferred
-    MockERC20BurnAndMintToken(token).approve(router, amount);
+    MiddleEastECommerce(token).approve(router, amount);
 
     // Prepare the CCIP message
     Client.EVMTokenAmount[] memory tokenToSendDetails = new Client.EVMTokenAmount[](1);

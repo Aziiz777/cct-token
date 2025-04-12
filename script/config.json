@@ -1,7 +1,7 @@
 {
-    "phoneToken": {
-        "name": "phone",
-        "symbol": "ph",
+    "MiddleEast": {
+        "name": "Middle East E-Commerce",
+        "symbol": "ME",
         "decimals": 18,
         "maxSupply": 0,
         "withGetCCIPAdmin": true,
@@ -11,7 +11,7 @@
     "tokenAmountToTransfer": 10000,
     "feeType": "native",
     "remoteChains": {
-        "421614": 97,
+        "11155111": 97,
         // "11155111": 421614,
         // "421614": 11155111
     }
